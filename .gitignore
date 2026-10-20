@@ -5,3 +5,4 @@ backend/writable/logs/*
 backend/writable/session/*
 backend/writable/debugbar/*
 !backend/writable/**/index.html
+frontend/node_modules/*
