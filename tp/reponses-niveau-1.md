@@ -29,3 +29,56 @@ curl -i -X POST http://localhost:8080/api/commandes \
 ```
 
 Si la requête est acceptée, le serveur n'applique pas encore la règle d'épuisement. Au niveau 2, cette règle doit aussi être vérifiée dans le service côté serveur.
+
+### 1.4 Filtrer les plats disponibles
+
+``` bash
+ curl "http://localhost:8080/api/plats?categorie=1&disponible=1"
+[
+    {
+        "id": 3,
+        "nom": "Akoho sy voanio",
+        "prix": 9000,
+        "id_categorie": 1,
+        "description": "Poulet préparé avec du lait de coco.",
+        "disponible": true,
+        "categorie": "Plat"
+    },
+    {
+        "id": 5,
+        "nom": "Henakisoa sy tsaramaso",
+        "prix": 8000,
+        "id_categorie": 1,
+        "description": "Porc servi avec des haricots.",
+        "disponible": true,
+        "categorie": "Plat"
+    },
+    {
+        "id": 2,
+        "nom": "Ravitoto sy henakisoa",
+        "prix": 8000,
+        "id_categorie": 1,
+        "description": "Feuilles de manioc pilées avec du porc.",
+        "disponible": true,
+        "categorie": "Plat"
+    },
+    {
+        "id": 4,
+        "nom": "Romazava",
+        "prix": 7000,
+        "id_categorie": 1,
+        "description": "Bouillon malgache avec viande et brèdes.",
+        "disponible": true,
+        "categorie": "Plat"
+    },
+    {
+        "id": 1,
+        "nom": "Vary amin'anana",
+        "prix": 2000,
+        "id_categorie": 1,
+        "description": "Riz accompagné de feuilles vertes.",
+        "disponible": true,
+        "categorie": "Plat"
+    }
+]
+```

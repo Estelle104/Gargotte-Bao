@@ -1,25 +1,17 @@
--- Catégorie goûter : le script peut être relancé sans la dupliquer.
+-- inserer gouter dabs categirie
 INSERT INTO categorie (libelle)
 VALUES ('Goûter')
 ON CONFLICT (libelle) DO NOTHING;
 
--- Quelques plats de goûter sans identifiants écrits en dur.
-INSERT INTO plat (nom, prix, id_categorie, description)
-SELECT x.nom, x.prix, c.id, x.description
-FROM (VALUES
-    ('Mofo gasy', 500, 'Petite galette de riz cuite dans un moule spécial.'),
-    ('Mokary', 500, 'Galette de farine de riz et de lait de coco.'),
-    ('Koba', 1000, 'Pâte de riz, arachide et banane cuite dans une feuille.'),
-    ('Godrogodro', 800, 'Gâteau malgache parfumé à la cannelle.'),
-    ('Menakely', 500, 'Beignet malgache croustillant.')
-) AS x(nom, prix, description)
-JOIN categorie c ON c.libelle = 'Goûter'
-ON CONFLICT (nom) DO UPDATE
-SET prix = EXCLUDED.prix,
-    id_categorie = EXCLUDED.id_categorie,
-    description = EXCLUDED.description;
+-- Quelques plats de goûter.
+INSERT INTO plat (nom, prix, id_categorie, description) VALUES 
+('Mofo gasy', 500, (SELECT id FROM categorie WHERE libelle = 'Goûter'), 'Petite galette de riz cuite dans un moule spécial.'),
+('Mokary', 500, (SELECT id FROM categorie WHERE libelle = 'Goûter'), 'Galette de farine de riz et de lait de coco.'),
+('Koba', 1000, (SELECT id FROM categorie WHERE libelle = 'Goûter'), 'Pâte de riz, arachide et banane cuite dans une feuille.'),
+('Godrogodro', 800, (SELECT id FROM categorie WHERE libelle = 'Goûter'), 'Gâteau malgache parfumé à la cannelle.'),
+('Menakely', 500, (SELECT id FROM categorie WHERE libelle = 'Goûter'), 'Beignet malgache croustillant.');
 
--- Descriptions de plats déjà présents dans la carte.
+-- ajout desc au plat
 UPDATE plat SET description = 'Riz accompagné de feuilles vertes.'
 WHERE nom = 'Vary amin''anana';
 UPDATE plat SET description = 'Feuilles de manioc pilées avec du porc.'
@@ -31,19 +23,22 @@ WHERE nom = 'Romazava';
 UPDATE plat SET description = 'Porc servi avec des haricots.'
 WHERE nom = 'Henakisoa sy tsaramaso';
 
--- Deux plats momentanément épuisés.
+-- marquer certains plats comme non disponibles
 UPDATE plat SET disponible = FALSE WHERE nom IN ('Mi sao', 'Soupe chinoise');
 
--- Plat du jour pour les sept derniers jours, avec un plat disponible par date.
-INSERT INTO plat_du_jour (date_jour, id_plat)
-SELECT jours.jour, choix.id
-FROM generate_series(CURRENT_DATE - 6, CURRENT_DATE, INTERVAL '1 day') AS jours(jour)
-CROSS JOIN LATERAL (
-    SELECT p.id
-    FROM plat p
-    JOIN categorie c ON c.id = p.id_categorie
-    WHERE c.libelle IN ('Plat', 'Soupe') AND p.disponible = TRUE
-    ORDER BY random()
-    LIMIT 1
-) AS choix
-ON CONFLICT (date_jour) DO UPDATE SET id_plat = EXCLUDED.id_plat;
+-- Plat du jour pour les 6 derniers jours, avec un plat disponible par date.
+INSERT INTO plat_du_jour (date_jour, id_plat) VALUES
+(CURRENT_DATE - INTERVAL '6 days', (SELECT id FROM plat WHERE nom = 'Vary amin''anana')),
+(CURRENT_DATE - INTERVAL '5 days', (SELECT id FROM plat WHERE nom = 'Ravitoto sy henakisoa')),
+(CURRENT_DATE - INTERVAL '4 days', (SELECT id FROM plat WHERE nom = 'Akoho sy voanio')),
+(CURRENT_DATE - INTERVAL '3 days', (SELECT id FROM plat WHERE nom = 'Romazava')),
+(CURRENT_DATE -INTERVAL '2 days', (SELECT id FROM plat WHERE nom = 'Henakisoa sy tsaramaso')),
+(CURRENT_DATE - INTERVAL '1 day', (SELECT id FROM plat WHERE nom = 'Mi sao')),
+(CURRENT_DATE, (SELECT id FROM plat WHERE nom = 'Soupe chinoise'));
+
+-- INsertion plat
+INSERT INTO plat (nom, prix, id_categorie, description) VALUES 
+('Mofo gasy', 0, (SELECT id FROM categorie WHERE libelle = 'Goûter'), 'Petite galette de riz cuite dans un moule spécial.');
+
+INSERT INTO plat (nom, prix, id_categorie, description) VALUES 
+(NULL, 9, (SELECT id FROM categorie WHERE libelle = 'Goûter'), 'Petite galette de riz cuite dans un moule spécial.');
